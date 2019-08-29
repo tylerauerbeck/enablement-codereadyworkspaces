@@ -3,6 +3,7 @@ operator_namespace: "do500-workspaces"
 config_namespace: "openshift-marketplace"
 
 openshift_cluster_content:
+- galaxy_requirements: "{{ inventory_dir }}/../files/galaxy_requirements.yml"
 - object: projectrequest
   content:
   - name: DO500 CodeReady Workspace
