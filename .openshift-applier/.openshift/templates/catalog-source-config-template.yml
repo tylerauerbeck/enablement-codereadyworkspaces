@@ -1,0 +1,20 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: catalog-source-config-template 
+objects:
+- apiVersion: operators.coreos.com/v1
+  kind: CatalogSourceConfig
+  metadata:
+    name: installed-${TARGET_NAMESPACE}
+  spec:
+    csDisplayName: Red Hat Operators
+    csPublisher: Red Hat
+    packages: ${PACKAGES} 
+    targetNamespace: ${TARGET_NAMESPACE}
+parameters:
+- name: TARGET_NAMESPACE
+  description: Deploy Namespace
+- name: PACKAGES
+  description: Operators to install

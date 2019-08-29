@@ -1,0 +1,37 @@
+---
+kind: Template
+apiVersion: v1
+metadata:
+  name: catalog-source-config-template
+objects:
+- apiVersion: operators.coreos.com/v1alpha1
+  kind: Subscription
+  metadata:
+    labels:
+      csc-owner-name: installed-${TARGET_NAMESPACE}
+      csc-owner-namespace: ${CONFIG_NAMESPACE}
+    name: ${OPERATOR_NAME}
+  spec:
+    channel: ${CHANNEL_NAME}
+    installPlanApproval: ${INSTALL_PLAN}
+    name: ${OPERATOR_NAME}
+    source: installed-${TARGET_NAMESPACE}
+    sourceNamespace: ${TARGET_NAMESPACE}
+    startingCSV: ${CSV}
+parameters:
+- name: TARGET_NAMESPACE
+  description: Namespace to deploy the operator in
+- name: CONFIG_NAMESPACE
+  description: Namespace that holds your catalogsourceconfig (csc)
+  value: openshift-marketplace
+- name: OPERATOR_NAME
+  description: Name of the packagemanifest to deploy
+- name: CHANNEL_NAME
+  description: Channel name to subscribe to
+  required: true
+- name: INSTALL_PLAN
+  description: Rollout plan (Automatic or Manual)
+  value: Manual
+- name: CSV
+  description: Version of the operator to use
+  required: true

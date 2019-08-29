@@ -1,0 +1,89 @@
+app_name: "codeready-workspaces"
+operator_namespace: "do500-workspaces"
+config_namespace: "openshift-marketplace"
+
+openshift_cluster_content:
+- object: projectrequest
+  content:
+  - name: DO500 CodeReady Workspace
+    template: "{{ openshift_templates_raw }}/{{ openshift_templates_version }}/project-requests/create-project.yml"
+    params_from_vars:
+      NAMESPACE: "{{ operator_namespace }}"
+      NAMESPACE_DISPLAY_NAME: "{{ operator_namespace }}"
+      NAMESPACE_DESCRIPTION: "{{ operator_namespace }}"
+    action: create
+    tags:
+    - do500-projects
+- object: permissions
+  content:
+  - name: codeready-operator service account
+    template: "{{ openshift_templates_raw }}/{{ openshift_templates_version }}/service-accounts/generic-service-account.yml"
+    params_from_vars:
+      SA_NAME: codeready-operator
+      SA_NAMESPACE: "{{ operator_namespace }}"
+    namespace: "{{ operator_namespace }}"
+    tags:
+    - do500-permissions
+    - do500-serviceaccount
+  - name: codeready oauth clusterrole
+    file: "{{ inventory_dir }}/../.openshift/files/oauth-clusterrole.yml"
+    tags:
+    - do500-permissions
+    - do500-clusterrole
+  - name: codeready oauth clusterrolebinding
+    file: "{{ inventory_dir }}/../.openshift/files/oauth-clusterrolebinding.yml"
+    tags:
+    - do500-permissions
+    - do500-clusterrole
+- object: imagestreams
+  content:
+  - name: Jenkins NPM Slave
+    template: "{{ openshift_templates_raw }}/{{ openshift_templates_version }}/imagestreams/imagestream-generic.yml"
+    params_from_vars:
+      IMAGE_STREAM_NAME: "jenkins-slave-npm"
+      IMAGE_STREAM_NAMESPACE: "openshift"
+      IMAGE_STREAM_ROLE: "jenkins-slave"
+      IMAGE_STREAM_TAG_FROM_NAME: "quay.io/rht-labs/enablement-npm"
+      IMAGE_STREAM_TAG_NAME: "latest"
+      IMAGE_STREAM_TAG_FROM_KIND: "DockerImage"
+    tags:
+    - do500-imagestreams
+    - do500-npm
+- object: deployments
+  content:
+  - name: Deploy OperatorGroup
+    file: "{{ inventory_dir }}/../.openshift/files/operatorgroup.yml"
+    namespace: "{{ operator_namespace }}"
+    action: create
+    tags:
+    - do500-operator
+  - name: Deploy Catalog Source Config
+    template: "{{ inventory_dir }}/../.openshift/templates/catalog-source-config-template.yml"
+    params_from_vars:
+      TARGET_NAMESPACE: "{{ operator_namespace }}"
+      PACKAGES: "{{ app_name }}"
+    namespace: "{{ config_namespace }}"
+    tags:
+    - do500-operator
+  - name: Deploy CRW Subscription
+    template: "{{ inventory_dir }}/../.openshift/templates/subscription-template.yml"
+    params_from_vars:
+      TARGET_NAMESPACE: "{{ operator_namespace }}"
+      CONFIG_NAMESPACE: "{{ config_namespace }}"
+      OPERATOR_NAME: "{{ app_name }}"
+      CHANNEL_NAME: "final"
+      INSTALL_PLAN: "Automatic"
+      CSV: "crwoperator.v1.2.0"
+    namespace: "{{ operator_namespace }}"
+    tags:
+    - do500-operator
+  - name: CodeReady Workspaces Plugin Registry
+    template: "{{ eclipse_che_raw }}/{{ eclipse_che_version }}/openshift/che-plugin-registry.yml"
+    params_from_vars:
+      IMAGE: "quay.io/rht-labs/che-plugin-registry"
+      IMAGE_TAG: "latest"
+      PULL_POLICY: "IfNotPresent"
+    namespace: "{{ operator_namespace }}"
+    tags:
+    - do500-registry
+# This is where we want to run a post-action for our custom factory

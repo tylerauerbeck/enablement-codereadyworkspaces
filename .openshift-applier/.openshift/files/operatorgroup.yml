@@ -1,0 +1,13 @@
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    olm.providedAPIs: CheCluster.v1.org.eclipse.che
+  generateName: do500-workspaces-
+spec:
+  serviceAccount:
+    metadata:
+      creationTimestamp: null
+  targetNamespaces:
+  - do500-workspaces
+            

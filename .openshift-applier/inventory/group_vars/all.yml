@@ -1,0 +1,8 @@
+openshift_templates_raw: "https://raw.githubusercontent.com/redhat-cop/openshift-templates"
+openshift_templates_version: "v1.4.12"
+
+containers_quickstarts_raw: "https://raw.githubusercontent.com/redhat-cop/containers-quickstarts"
+containers_quickstarts_version: "v1.14"
+
+eclipse_che_raw: "https://raw.githubusercontent.com/eclipse/che-plugin-registry"
+eclipse_che_version: 92c7499aeaa8030bf7f3e0dcab660007de028d00
